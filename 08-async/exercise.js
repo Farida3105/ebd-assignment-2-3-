@@ -24,7 +24,7 @@ import { findProduct, findAllProducts } from "./fake-db.js";
   return product.name;
 }
 
-
+}
 
 /**
  * A price label for one product, looked up by id.
