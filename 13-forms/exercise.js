@@ -1,32 +1,13 @@
-// 13-forms — your work goes in this file.
-//
-// The lesson is example.js:   npm run open 13
-// See your own page with:     npm run open 13 exercise
-// Check your work with:       npm test 13
-//
-// exercise.html is written for you and must not be edited. It gives you:
-//   #product-form   the form
-//   #name, #price   the two inputs
-//   #error          a line to show a problem in
-//   #list           an empty <ul> for the cards
-//
-// The first three are started for you. The LAST one has no code — you write
-// it, and it is the one that ties the whole of Part 2 together.
-
 /**
  * Reads what is currently typed into the two boxes.
- *
- * readForm() -> { name: "Pen", price: 15 }
- *
- * The name comes back trimmed. The price comes back as a NUMBER, not the
- * string the input gives you. An empty price box gives 0.
  *
  * @returns {{ name: string, price: number }}
  */
 export function readForm() {
-  // TODO: read .value off each input. Trim the name, and convert the price
-  // with Number().
-  throw new Error("readForm is not written yet");
+  const name = document.querySelector("#name").value.trim();
+  const price = Number(document.querySelector("#price").value);
+
+  return { name, price };
 }
 
 /**
@@ -35,55 +16,86 @@ export function readForm() {
  * @returns {void}
  */
 export function clearForm() {
-  // TODO: set each input's .value to an empty string.
-  throw new Error("clearForm is not written yet");
+  document.querySelector("#name").value = "";
+  document.querySelector("#price").value = "";
 }
 
 /**
  * Draws the list from an array of items, replacing whatever was there before.
  *
- * renderList([{ name: "Pen", price: 15 }]) puts this inside #list:
- *   <li class="card"><h3>Pen</h3><p class="price">15 EGP</p></li>
- *
- * Calling it again with a different array must REPLACE the old cards, not
- * add to them. An empty array leaves the list empty.
- *
  * @param {Array<{name: string, price: number}>} items
  * @returns {void}
  */
 export function renderList(items) {
-  // TODO: empty #list first, then build one card per item — the same card
-  // shape as module 12.
-  throw new Error("renderList is not written yet");
+  const list = document.querySelector("#list");
+
+  // Remove all existing cards first.
+  list.innerHTML = "";
+
+  // Create a card for every item.
+  items.forEach((item) => {
+    const card = document.createElement("li");
+    card.classList.add("card");
+
+    const heading = document.createElement("h3");
+    heading.textContent = item.name;
+
+    const priceElement = document.createElement("p");
+    priceElement.classList.add("price");
+    priceElement.textContent = `${item.price} EGP`;
+
+    card.append(heading, priceElement);
+    list.append(card);
+  });
 }
 
 /**
- * Now you write the whole function. This is the one that makes the page work.
+ * Handles form submission and validates the input.
  *
- * Write a function called `wireForm`.
- *
- *   Parameters: none.
- *   Returns:    nothing.
- *
- * It listens for the form's "submit" event, and when that happens:
- *
- *   1. Stops the browser reloading the page. Without this, everything else
- *      you do is thrown away a moment later.
- *   2. Reads the form.
- *   3. If the name is empty, puts the text
- *          Give the product a name.
- *      into #error, and stops there — nothing is added.
- *   4. If the price box is empty or is not a number greater than 0, puts
- *          Give the product a price.
- *      into #error, and stops there.
- *   5. Otherwise: clears #error, adds the item to a list of items that you
- *      keep in this file, redraws the list with `renderList`, and empties
- *      the form.
- *
- * Keep the items in an ordinary array, the way example.js does. The page is
- * a picture of that array, not the place the data lives.
- *
- * Remember `export`.
+ * @returns {void}
  */
+export function wireForm() {
+  const form = document.querySelector("#product-form");
+  const error = document.querySelector("#error");
 
-// TODO: write wireForm here.
+  // This array stores the products.
+  const items = [];
+
+  form.addEventListener("submit", (event) => {
+    // Stop the browser from reloading the page.
+    event.preventDefault();
+
+    // Read the form values.
+    const { name, price } = readForm();
+
+    // Check whether the name is empty.
+    if (!name) {
+      error.textContent = "Give the product a name.";
+      return;
+    }
+
+    // Check whether the price is empty, invalid, or not greater than zero.
+    const priceInput = document.querySelector("#price");
+
+    if (
+      priceInput.value.trim() === "" ||
+      !Number.isFinite(price) ||
+      price <= 0
+    ) {
+      error.textContent = "Give the product a price.";
+      return;
+    }
+
+    // The input is valid.
+    error.textContent = "";
+
+    // Store the new product.
+    items.push({ name, price });
+
+    // Update the webpage.
+    renderList(items);
+
+    // Empty the form.
+    clearForm();
+  });
+}
